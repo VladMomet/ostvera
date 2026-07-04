@@ -1,0 +1,50 @@
+# Yandex Cloud API Gateway — единый вход для сайта на одном домене.
+#
+#   POST /api/lead        → Cloud Function (serverless/lead)
+#   всё остальное (GET)    → Object Storage со ВКЛЮЧЁННЫМ static website hosting
+#                            (website-endpoint сам резолвит index.html для /ru/,
+#                            / и отдаёт 404.html — object_storage-интеграция так
+#                            не умеет, поэтому проксируем через http).
+#
+# Плейсхолдеры <...> заменить. Создать/обновить шлюз:
+#   yc serverless api-gateway create --name ostvera --spec=deploy/yandex/apigateway.yaml
+#   yc serverless api-gateway update ostvera --spec=deploy/yandex/apigateway.yaml
+openapi: 3.0.0
+info:
+  title: ostvera
+  version: "1.0"
+
+paths:
+  # --- обработчик заявки: same-origin, поэтому фронт шлёт на /api/lead ---
+  /api/lead:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <FUNCTION_ID>            # id функции из serverless/lead
+        tag: "$latest"
+        service_account_id: <SERVICE_ACCOUNT_ID>
+    options:                                   # CORS preflight — тоже в функцию
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <FUNCTION_ID>
+        tag: "$latest"
+        service_account_id: <SERVICE_ACCOUNT_ID>
+
+  # --- корень сайта ---
+  /:
+    get:
+      x-yc-apigateway-integration:
+        type: http
+        url: https://<BUCKET_NAME>.website.yandexcloud.net/
+
+  # --- вся статика: проксируем на website-endpoint бакета ---
+  /{path+}:
+    get:
+      parameters:
+        - name: path
+          in: path
+          required: true
+          schema: { type: string }
+      x-yc-apigateway-integration:
+        type: http
+        url: https://<BUCKET_NAME>.website.yandexcloud.net/{path}

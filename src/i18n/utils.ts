@@ -10,19 +10,20 @@ export function L(lang: Locale, ru: string, en: string): string {
 // Production domain. Keep in sync with astro.config.mjs and public/robots.txt.
 export const SITE = 'https://ostvera.ru';
 
-// Full name of the sole trader (ИП), built from parts so the patronymic (отчество)
-// lives in one place. Order per Russian convention: Фамилия Имя Отчество.
+// Full name of the sole trader (ИП), built from parts so the requisites live in one
+// place. Order per Russian convention: Фамилия Имя Отчество. Отчество опционально —
+// если появится, впишите в patronymicRu/En, пустые части отбрасываются автоматически.
 const owner = {
   lastNameRu: 'Оболенский',
   firstNameRu: 'Владимир',
-  patronymicRu: 'Владимирович', // отчество оператора
+  patronymicRu: '', // отчество (нет)
   lastNameEn: 'Obolenskiy',
   firstNameEn: 'Vladimir',
-  patronymicEn: 'Vladimirovich',
+  patronymicEn: '',
 };
 
-const operatorRu = `ИП ${owner.lastNameRu} ${owner.firstNameRu} ${owner.patronymicRu}`.trim();
-const operatorEn = `Sole trader ${owner.firstNameEn} ${owner.patronymicEn} ${owner.lastNameEn}`.trim();
+const operatorRu = ['ИП', owner.lastNameRu, owner.firstNameRu, owner.patronymicRu].filter(Boolean).join(' ');
+const operatorEn = ['Sole trader', owner.firstNameEn, owner.patronymicEn, owner.lastNameEn].filter(Boolean).join(' ');
 
 export const company = {
   brand: 'Ostvera',
