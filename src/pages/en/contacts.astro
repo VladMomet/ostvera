@@ -1,0 +1,19 @@
+---
+import InnerPage from '../../components/InnerPage.astro';
+import { company } from '../../i18n/utils';
+const lang = 'en' as const;
+---
+<InnerPage lang={lang} path="/contacts" title="Contacts — Ostvera" description="Phone, Telegram, WhatsApp and company details of Ostvera." heading="Contacts" kicker="Ostvera">
+  <p class="lead">Send your task &mdash; we&rsquo;ll return with sourcing and price within 24 hours.</p>
+  <h3>Contact</h3>
+  <ul>
+    <li>Phone: <a href={'tel:' + company.phoneHref}>{company.phone}</a></li>
+    <li>Telegram: <a href={'https://t.me/' + company.telegram.replace('@','')}>{company.telegram}</a></li>
+    <li>WhatsApp: <a href={'https://wa.me/' + company.whatsapp.replace('+','')}>{company.phone}</a></li>
+    <li>E-mail: <a href={'mailto:' + company.email}>{company.email}</a></li>
+  </ul>
+  <h3>Send a request</h3>
+  <p>Fill in the form on the <a href="/en/#contact">home page</a> &mdash; describe what you need to equip, and we&rsquo;ll propose options, documents and timelines.</p>
+  <h3>Company details</h3>
+  <p>{company.operatorEn} · INN {company.inn} · OGRNIP {company.ogrnip} · {company.addressEn}</p>
+</InnerPage>

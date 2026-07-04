@@ -1,0 +1,10 @@
+---
+import InnerPage from '../../components/InnerPage.astro';
+import { company } from '../../i18n/utils';
+const lang = 'en' as const;
+---
+<InnerPage lang={lang} path="/offer" title="Public offer — Ostvera" description="Terms of medical equipment sourcing and supply services." heading="Public offer" kicker="Agreement">
+  <p class="lead">Public offer for medical equipment sourcing and supply services. Template pending legal review; the authoritative version is in Russian.</p>
+  <h2>Summary</h2>
+  <p>This is a public offer by {company.operatorEn} (INN {company.inn}, OGRNIP {company.ogrnip}). The offer is accepted by submitting a request through the website. The contractor provides sourcing, procurement, documentation, logistics and supply services on terms agreed per request.</p>
+</InnerPage>

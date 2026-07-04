@@ -1,0 +1,19 @@
+---
+import InnerPage from '../../components/InnerPage.astro';
+import { company } from '../../i18n/utils';
+const lang = 'ru' as const;
+---
+<InnerPage lang={lang} path="/contacts" title="Контакты — Ostvera" description="Телефон, Telegram, WhatsApp и реквизиты Ostvera." heading="Контакты" kicker="Ostvera">
+  <p class="lead">Пришлите задачу — вернёмся с подбором и ценой в течение 24 часов.</p>
+  <h3>Связь</h3>
+  <ul>
+    <li>Телефон: <a href={'tel:' + company.phoneHref}>{company.phone}</a></li>
+    <li>Telegram: <a href={'https://t.me/' + company.telegram.replace('@','')}>{company.telegram}</a></li>
+    <li>WhatsApp: <a href={'https://wa.me/' + company.whatsapp.replace('+','')}>{company.phone}</a></li>
+    <li>E-mail: <a href={'mailto:' + company.email}>{company.email}</a></li>
+  </ul>
+  <h3>Оставить заявку</h3>
+  <p>Заполните форму на <a href="/ru/#contact">главной странице</a> — опишите, что нужно оснастить, и мы предложим варианты, документы и сроки.</p>
+  <h3>Реквизиты</h3>
+  <p>{company.operatorRu} · ИНН {company.inn} · ОГРНИП {company.ogrnip} · {company.addressRu}</p>
+</InnerPage>

@@ -1,0 +1,8 @@
+---
+import Base from '../../layouts/Base.astro';
+import home from '../../partials/home.ru.html?raw';
+const lang = 'ru' as const;
+---
+<Base lang={lang} title="Ostvera — медицинское оборудование из Китая в РФ" description="Поставки медтехники из Китая в Россию под ключ: подбор на фабриках, контроль качества, РУ Росздравнадзора, ЕАЭС, растаможка, гарантия и сервис." path="/">
+  <Fragment set:html={home} />
+</Base>

@@ -1,0 +1,13 @@
+---
+import InnerPage from '../../components/InnerPage.astro';
+const lang = 'ru' as const;
+---
+<InnerPage lang={lang} path="/cookie" title="Использование cookie — Ostvera" description="Как сайт Ostvera использует cookie и веб-аналитику." heading="Использование cookie" kicker="Cookie">
+  <p class="lead">Сайт использует cookie и системы веб-аналитики для корректной работы и улучшения сервиса.</p>
+  <h2>Какие cookie используются</h2>
+  <ul>
+    <li>Технические — необходимы для работы сайта.</li>
+    <li>Аналитические — статистика посещений (например, Яндекс.Метрика).</li>
+  </ul>
+  <p>Продолжая пользоваться сайтом, вы соглашаетесь с использованием cookie. Вы можете отключить cookie в настройках браузера.</p>
+</InnerPage>

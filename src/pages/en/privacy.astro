@@ -1,0 +1,14 @@
+---
+import InnerPage from '../../components/InnerPage.astro';
+import { company } from '../../i18n/utils';
+const lang = 'en' as const;
+---
+<InnerPage lang={lang} path="/privacy" title="Privacy Policy — Ostvera" description="How Ostvera processes personal data under Russian law 152-FZ." heading="Privacy Policy" kicker="152-FZ">
+  <p class="lead">This page provides an English summary. The authoritative privacy notice is issued in Russian in accordance with Russian Federal Law No. 152-FZ. This is a template pending legal review.</p>
+  <h2>Operator</h2>
+  <p>{company.operatorEn}, INN {company.inn}, OGRNIP {company.ogrnip}, {company.addressEn}. Data protection contact: {company.email}.</p>
+  <h2>Data &amp; purposes</h2>
+  <p>We process name, company, phone and e-mail submitted via the request form, in order to handle requests, prepare quotes and communicate with the user. Personal data of Russian citizens is stored on servers located in the Russian Federation.</p>
+  <h2>Your rights</h2>
+  <p>You may request information about, correction, blocking or deletion of your data by writing to {company.email}.</p>
+</InnerPage>

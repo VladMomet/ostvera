@@ -1,0 +1,102 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE, company, type Locale } from '../i18n/utils';
+
+interface Props { lang: Locale; title: string; description?: string; path?: string; }
+const { lang, title, description = '', path = '/' } = Astro.props;
+const clean = path === '/' ? '' : path;
+const url = (l: string) => SITE + '/' + l + clean + (clean === '' ? '/' : '');
+const canonical = url(lang);
+const jsonld = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: company.brand,
+  url: SITE,
+  telephone: company.phone,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Пресненская набережная, 10',
+    addressLocality: 'Москва',
+    addressCountry: 'RU',
+  },
+  description:
+    lang === 'en'
+      ? 'Turnkey medical equipment supply from China to Russia.'
+      : 'Поставки медицинского оборудования из Китая в Россию под ключ.',
+};
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="ru" href={url('ru')} />
+    <link rel="alternate" hreflang="en" href={url('en')} />
+    <link rel="alternate" hreflang="x-default" href={url('ru')} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="robots" content="index,follow" />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
+    <!-- TODO: Яндекс.Метрика — вставить код счётчика и цель на форму / insert Metrica counter here -->
+  </head>
+  <body>
+    <Header lang={lang} path={path} />
+    <slot />
+    <Footer lang={lang} />
+    <script>
+      const io = new IntersectionObserver(
+        (es) => {
+          es.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              if (e.target.classList.contains('trust__num')) countUp(e.target);
+              io.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.16 }
+      );
+      document.querySelectorAll('.rv,.trust__num').forEach((el) => io.observe(el));
+      function countUp(el) {
+        const t = parseInt(el.getAttribute('data-count'), 10);
+        const s = el.querySelector('span');
+        let st = null;
+        const d = 1100;
+        const loc = document.documentElement.lang === 'en' ? 'en-US' : 'ru-RU';
+        function tick(x) {
+          if (!st) st = x;
+          const p = Math.min((x - st) / d, 1);
+          const v = Math.floor(t * (1 - Math.pow(1 - p, 2)));
+          s.textContent = v.toLocaleString(loc);
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+      const f = document.querySelector('form[data-lead]');
+      if (f) {
+        f.addEventListener('submit', async (ev) => {
+          ev.preventDefault();
+          if (f.website && f.website.value) return; // honeypot
+          const ok = document.getElementById('ok');
+          try {
+            await fetch('/api/lead', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(Object.fromEntries(new FormData(f))),
+            });
+          } catch (e) {}
+          if (ok) ok.style.display = 'block';
+          f.reset();
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+---
+import InnerPage from '../../components/InnerPage.astro';
+import { company } from '../../i18n/utils';
+const lang = 'en' as const;
+---
+<InnerPage lang={lang} path="/consent" title="Data consent — Ostvera" description="Consent to personal data processing when submitting a request." heading="Data consent" kicker="152-FZ">
+  <p class="lead">By submitting the form, the user consents to the processing of personal data. Template pending legal review; the authoritative version is in Russian.</p>
+  <h2>Consent to personal data processing</h2>
+  <p>The user consents to {company.operatorEn} (INN {company.inn}) processing the personal data provided in the form (name, company, phone, e-mail, message) in order to handle the request, prepare a quote and communicate with the user. Consent is valid until withdrawn by writing to {company.email}.</p>
+</InnerPage>

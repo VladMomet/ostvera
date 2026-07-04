@@ -1,0 +1,45 @@
+---
+import { L, company, type Locale } from '../i18n/utils';
+interface Props { lang: Locale; path?: string; }
+const { lang, path = '/' } = Astro.props;
+const base = '/' + lang;
+const clean = path === '/' ? '/' : path;
+const nav: [string, string][] = [
+  ['/#models', L(lang, 'Как работаем', 'How we work')],
+  ['/#dirs',   L(lang, 'Направления', 'Equipment')],
+  ['/#why',    L(lang, 'Почему мы', 'Why us')],
+  ['/#cases',  L(lang, 'Кейсы', 'Cases')],
+  ['/about',   L(lang, 'О компании', 'About')],
+  ['/contacts',L(lang, 'Контакты', 'Contacts')],
+];
+---
+<header class="hdr">
+  <div class="wrap hdr__in">
+    <a class="brand" href={base + '/'} aria-label="Ostvera">
+      <span class="brand__word">OST<b>VERA</b></span>
+      <span class="brand__tag">{L(lang, 'Мед. оборудование · КНР → РФ', 'Med. equipment · CN → RU')}</span>
+    </a>
+    <nav class="nav">
+      {nav.map(([href, label]) => <a href={base + href}>{label}</a>)}
+    </nav>
+    <div class="hdr__right">
+      <span class="hdr__phone">{company.phone}</span>
+      <div class="lang" role="group" aria-label="Language">
+        <a href={'/ru' + clean} class={lang === 'ru' ? 'on' : ''}>RU</a>
+        <a href={'/en' + clean} class={lang === 'en' ? 'on' : ''}>EN</a>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu">{L(lang, 'МЕНЮ', 'MENU')}</button>
+    </div>
+  </div>
+  <div class="mnav" id="mnav">
+    {nav.map(([href, label]) => <a href={base + href}>{label}</a>)}
+  </div>
+</header>
+<script>
+  const b = document.getElementById('burger');
+  const m = document.getElementById('mnav');
+  if (b && m) {
+    b.addEventListener('click', () => m.classList.toggle('open'));
+    m.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => m.classList.remove('open')));
+  }
+</script>

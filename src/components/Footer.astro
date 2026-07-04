@@ -1,0 +1,50 @@
+---
+import { L, company, type Locale } from '../i18n/utils';
+interface Props { lang: Locale; }
+const { lang } = Astro.props;
+const base = '/' + lang;
+---
+<footer class="ft">
+  <div class="wrap">
+    <div class="ft__top">
+      <div>
+        <div class="ft__word">OST<b>VERA</b></div>
+        <p style="margin-top:14px;max-width:30ch;font-size:14px">{L(lang,
+          'Инженерно-логистический партнёр по поставке медицинского оборудования из Китая в Россию.',
+          'Engineering and logistics partner for medical equipment supply from China to Russia.')}</p>
+      </div>
+      <div>
+        <h4>{L(lang, 'Разделы', 'Sections')}</h4>
+        <ul>
+          <li><a href={base + '/#dirs'}>{L(lang, 'Направления', 'Equipment')}</a></li>
+          <li><a href={base + '/#models'}>{L(lang, 'Как работаем', 'How we work')}</a></li>
+          <li><a href={base + '/about'}>{L(lang, 'О компании', 'About')}</a></li>
+          <li><a href={base + '/contacts'}>{L(lang, 'Контакты', 'Contacts')}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>{L(lang, 'Документы', 'Legal')}</h4>
+        <ul>
+          <li><a href={base + '/privacy'}>{L(lang, 'Политика конфиденциальности', 'Privacy Policy')}</a></li>
+          <li><a href={base + '/consent'}>{L(lang, 'Согласие на обработку ПДн', 'Data consent')}</a></li>
+          <li><a href={base + '/offer'}>{L(lang, 'Оферта', 'Offer')}</a></li>
+          <li><a href={base + '/cookie'}>{L(lang, 'Cookie', 'Cookie')}</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>{L(lang, 'Реквизиты', 'Details')}</h4>
+        <div class="ft__req">
+          <span>{L(lang, company.operatorRu, company.operatorEn)}</span><br />
+          ИНН {company.inn}<br />
+          ОГРНИП {company.ogrnip}<br />
+          <span>{L(lang, company.addressRu, company.addressEn)}</span><br />
+          {company.phone}
+        </div>
+      </div>
+    </div>
+    <div class="ft__bottom">
+      <span>© 2026 Ostvera</span>
+      <span>{L(lang, 'КНР → РФ · поставки под ключ', 'CN → RU · turnkey supply')}</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"console.log\\('astro', require\\('./node_modules/astro/package.json'\\).version\\); console.log\\('sitemap', require\\('./node_modules/@astrojs/sitemap/package.json'\\).version\\)\")",
+      "Bash(npm view *)",
+      "Bash(echo \"started pid $!\")",
+      "Read(//tmp/claude-501/-Users-vobolenskiy-Downloads-ostvera/c54ed202-b9e9-4357-9880-a5c61343c96e/scratchpad/**)",
+      "Bash(kill 98489)",
+      "Bash(mkdir -p /Users/vobolenskiy/Downloads/ostvera/.claude)",
+      "Bash(node index.mjs '{\"name\":\"A\",\"phone\":\"+7\",\"consent\":\"yes\",\"website\":\"spam\"}')",
+      "Bash(node index.mjs '{\"name\":\"A\",\"phone\":\"+7\"}')",
+      "Bash(node index.mjs '{\"name\":\"A\",\"consent\":\"yes\"}')",
+      "Bash(node index.mjs '{\"name\":\"Иван\",\"phone\":\"+79990000000\",\"need\":\"3 УЗИ\",\"consent\":\"yes\"}')",
+      "Bash(curl -s http://localhost:4321/ru/)",
+      "Bash(curl -s http://localhost:4321/ru/contacts/)",
+      "Bash(curl -s http://localhost:4321/en/)",
+      "Bash(curl -s http://localhost:4321/ru/privacy/)",
+      "Bash(git init *)",
+      "Bash(git symbolic-ref *)",
+      "Bash(command -v gh)",
+      "Bash(gh auth *)",
+      "Bash(git config *)",
+      "Bash(echo \"name set: $\\(git config user.name\\)\")",
+      "Bash(git add *)"
+    ]
+  }
+}
