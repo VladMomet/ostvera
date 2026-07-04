@@ -7,7 +7,9 @@ import { SITE, company, type Locale } from '../i18n/utils';
 interface Props { lang: Locale; title: string; description?: string; path?: string; }
 const { lang, title, description = '', path = '/' } = Astro.props;
 const clean = path === '/' ? '' : path;
-const url = (l: string) => SITE + '/' + l + clean + (clean === '' ? '/' : '');
+// Always end with a trailing slash so canonical/hreflang match the directory-format
+// URLs Astro actually serves (and the sitemap): /ru/, /en/about/, …
+const url = (l: string) => SITE + '/' + l + clean + '/';
 const canonical = url(lang);
 const jsonld = {
   '@context': 'https://schema.org',
