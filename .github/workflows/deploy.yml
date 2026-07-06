@@ -1,0 +1,80 @@
+name: Deploy to Yandex Cloud
+
+# Собирает сайт и деплоит при каждом пуше в main (и по кнопке «Run workflow»).
+#   ./dist            → Object Storage (static website hosting)
+#   serverless/lead   → Cloud Function /api/lead
+# Список секретов и как их получить — deploy/yandex/github-actions.md
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      # --- статика → Object Storage ---
+      # Хешированные ассеты Astro (/_astro/**) неизменяемы — кладём с длинным кэшем.
+      - name: Sync assets (immutable, long cache)
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.YC_STORAGE_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_STORAGE_SECRET }}
+          AWS_DEFAULT_REGION: ru-central1
+        run: |
+          aws s3 sync ./dist "s3://${{ secrets.YC_BUCKET }}/" \
+            --endpoint-url=https://storage.yandexcloud.net \
+            --exclude "*" --include "_astro/*" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Sync the rest (html, sitemap, robots) + prune old files
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.YC_STORAGE_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_STORAGE_SECRET }}
+          AWS_DEFAULT_REGION: ru-central1
+        run: |
+          aws s3 sync ./dist "s3://${{ secrets.YC_BUCKET }}/" \
+            --endpoint-url=https://storage.yandexcloud.net \
+            --exclude "_astro/*" \
+            --cache-control "public,max-age=300" \
+            --delete
+
+      # --- функция → Cloud Functions ---
+      # Зависимости (nodemailer) YC ставит сам из serverless/lead/package.json.
+      - name: Deploy /api/lead function
+        uses: yc-actions/yc-sls-function@v3
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          function-id: ${{ secrets.YC_FUNCTION_ID }}
+          runtime: nodejs18
+          entrypoint: index.handler
+          memory: 128Mb
+          execution-timeout: 10
+          source-root: serverless/lead
+          exclude: |
+            **/node_modules
+          environment: |
+            TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}
+            TELEGRAM_CHAT_ID=${{ secrets.TELEGRAM_CHAT_ID }}
+            MAIL_TO=${{ secrets.MAIL_TO }}
+            MAIL_FROM=${{ secrets.MAIL_FROM }}
+            SMTP_HOST=${{ secrets.SMTP_HOST }}
+            SMTP_PORT=${{ secrets.SMTP_PORT }}
+            SMTP_USER=${{ secrets.SMTP_USER }}
+            SMTP_PASS=${{ secrets.SMTP_PASS }}
+            ALLOW_ORIGIN=https://ostvera.ru

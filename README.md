@@ -52,6 +52,11 @@ src/
 - ⬜ **Юридические тексты** (`privacy/consent/offer/cookie`) — шаблоны, обязательно на проверку юристу.
 - ⬜ **Яндекс.Метрика** — вставить счётчик в `Base.astro` (комментарий-метка в `<head>`), настроить цель на отправку формы.
 
+## Деплой
+- Инструкция по Yandex Cloud: `deploy/yandex/README.md` (Object Storage + Cloud Function + API Gateway).
+- Автодеплой на пуш в `main`: `.github/workflows/deploy.yml`, список секретов — `deploy/yandex/github-actions.md`.
+- Обработчик формы: `serverless/README.md`.
+
 ## Форма и 152-ФЗ
 Персональные данные из формы должны храниться на серверах в РФ. Рекомендуется:
 - разместить сайт на российском облаке (**Timeweb Cloud** или **Yandex Cloud**);
