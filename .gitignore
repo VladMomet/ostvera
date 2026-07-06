@@ -6,3 +6,8 @@ dist/
 !.env.example
 .DS_Store
 npm-debug.log*
+
+# secrets / generated artefacts (Yandex Cloud provisioning)
+sa-key.json
+serverless/lead.zip
+deploy/yandex/apigateway.generated.yaml
