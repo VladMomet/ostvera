@@ -1,9 +1,10 @@
 name: Deploy to Yandex Cloud
 
 # Собирает сайт и деплоит при каждом пуше в main (и по кнопке «Run workflow»).
-#   ./dist            → Object Storage (static website hosting)
+#   ./dist            → Object Storage (бакет статики)
 #   serverless/lead   → Cloud Function /api/lead
-# Список секретов и как их получить — deploy/yandex/github-actions.md
+# Шаги условные: статика деплоится, если задан секрет YC_BUCKET; функция —
+# если задан YC_FUNCTION_ID. Список секретов — deploy/yandex/github-actions.md
 on:
   push:
     branches: [main]
@@ -16,6 +17,9 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      YC_BUCKET: ${{ secrets.YC_BUCKET }}
+      YC_FUNCTION_ID: ${{ secrets.YC_FUNCTION_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -29,9 +33,10 @@ jobs:
           npm ci
           npm run build
 
-      # --- статика → Object Storage ---
+      # --- статика → Object Storage (если задан YC_BUCKET) ---
       # Хешированные ассеты Astro (/_astro/**) неизменяемы — кладём с длинным кэшем.
       - name: Sync assets (immutable, long cache)
+        if: env.YC_BUCKET != ''
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.YC_STORAGE_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_STORAGE_SECRET }}
@@ -43,6 +48,7 @@ jobs:
             --cache-control "public,max-age=31536000,immutable"
 
       - name: Sync the rest (html, sitemap, robots) + prune old files
+        if: env.YC_BUCKET != ''
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.YC_STORAGE_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.YC_STORAGE_SECRET }}
@@ -54,9 +60,10 @@ jobs:
             --cache-control "public,max-age=300" \
             --delete
 
-      # --- функция → Cloud Functions ---
+      # --- функция → Cloud Functions (если задан YC_FUNCTION_ID) ---
       # Зависимости (nodemailer) YC ставит сам из serverless/lead/package.json.
       - name: Deploy /api/lead function
+        if: env.YC_FUNCTION_ID != ''
         uses: yc-actions/yc-sls-function@v3
         with:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
