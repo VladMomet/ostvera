@@ -3,10 +3,10 @@
  * ------------------------------------------------------------------
  * Serverless-функция для РФ-облака (Yandex Cloud Functions / Timeweb Cloud).
  * Принимает JSON от формы на сайте → шлёт заявку в Telegram-бот и на e-mail.
+ * CommonJS — максимально совместимо с рантаймом YC (Node.js 18).
  *
  * 152-ФЗ: функцию разворачиваем в российском регионе, секреты храним в
- * переменных окружения (не в коде), ПДн не логируем — только пересылаем
- * оператору. Ничего в сторонние сервисы, кроме Telegram API и вашего SMTP.
+ * переменных окружения (не в коде), ПДн не логируем — только пересылаем.
  *
  * Переменные окружения (задать в консоли облака):
  *   TELEGRAM_BOT_TOKEN   токен бота от @BotFather                (обязательно для TG)
@@ -18,10 +18,6 @@
  *   SMTP_USER            логин SMTP
  *   SMTP_PASS            пароль/пароль приложения SMTP
  *   ALLOW_ORIGIN         разрешённый origin для CORS  (по умолчанию https://ostvera.ru)
- *
- * Telegram работает на встроенном fetch (Node 18+). E-mail — через nodemailer
- * (см. package.json); если SMTP_* не заданы — отправка на почту тихо пропускается,
- * заявка всё равно уходит в Telegram.
  */
 
 const MAX_LEN = 2000; // защита от «раздувания» полей
@@ -61,14 +57,13 @@ function parseBody(event) {
   if (!event) return {};
   let raw = event.body;
   if (raw == null && typeof event === 'object' && !('httpMethod' in event)) {
-    // событие само по себе может быть телом
-    return event;
+    return event; // событие само по себе может быть телом
   }
   if (event.isBase64Encoded && typeof raw === 'string') {
     raw = Buffer.from(raw, 'base64').toString('utf8');
   }
   if (typeof raw === 'string') {
-    try { return JSON.parse(raw); } catch { return {}; }
+    try { return JSON.parse(raw); } catch (e) { return {}; }
   }
   return raw && typeof raw === 'object' ? raw : {};
 }
@@ -80,17 +75,19 @@ async function sendTelegram(text) {
   const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // без parse_mode — отправляем как обычный текст, чтобы не ловить инъекции разметки
     body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
   });
-  if (!res.ok) throw new Error('Telegram API ' + res.status);
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error('Telegram API ' + res.status + ' ' + detail.slice(0, 200));
+  }
   return { ok: true };
 }
 
 async function sendEmail(subject, text) {
   const { SMTP_HOST, SMTP_USER, SMTP_PASS } = process.env;
   if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return { ok: false, skipped: 'no SMTP_* env' };
-  const nodemailer = (await import('nodemailer')).default;
+  const nodemailer = require('nodemailer');
   const port = Number(process.env.SMTP_PORT || 465);
   const transport = nodemailer.createTransport({
     host: SMTP_HOST,
@@ -107,7 +104,8 @@ async function sendEmail(subject, text) {
   return { ok: true };
 }
 
-export const handler = async (event = {}) => {
+module.exports.handler = async function (event) {
+  event = event || {};
   const method = event.httpMethod || event.method || 'POST';
   if (method === 'OPTIONS') return { statusCode: 204, headers: corsHeaders(), body: '' };
   if (method !== 'POST') return reply(405, { ok: false, error: 'method not allowed' });
@@ -115,7 +113,6 @@ export const handler = async (event = {}) => {
   const data = parseBody(event);
 
   // 1) honeypot: реальный пользователь оставляет поле website пустым.
-  //    Бот заполнит — отвечаем «успех», но ничего не шлём.
   if (clean(data.website)) return reply(200, { ok: true });
 
   // 2) согласие на обработку ПДн обязательно (152-ФЗ)
@@ -128,7 +125,7 @@ export const handler = async (event = {}) => {
   const phone = clean(data.phone);
   if (!name || !phone) return reply(422, { ok: false, error: 'name and phone required' });
 
-  // 4) собираем текст заявки
+  // 4) текст заявки
   const lines = ['🩺 Новая заявка с сайта Ostvera', ''];
   for (const [key, label] of FIELDS) {
     const val = clean(data[key]);
@@ -139,22 +136,18 @@ export const handler = async (event = {}) => {
   const subject = `Заявка с сайта Ostvera — ${name}`;
 
   // 5) доставка: Telegram обязателен, e-mail — если настроен SMTP.
-  //    Заявку не теряем: если один канал упал, второй всё равно пробуем.
   const results = await Promise.allSettled([sendTelegram(text), sendEmail(subject, text)]);
   const delivered = results.some((r) => r.status === 'fulfilled' && r.value && r.value.ok);
 
   if (!delivered) {
-    // не раскрываем детали наружу, но помечаем провал (без ПДн в логах платформы)
-    console.error('lead delivery failed', results.map((r) => (r.status === 'rejected' ? r.reason?.message : r.value)));
+    console.error('lead delivery failed', results.map((r) => (r.status === 'rejected' ? (r.reason && r.reason.message) : r.value)));
     return reply(502, { ok: false, error: 'delivery failed' });
   }
   return reply(200, { ok: true });
 };
 
-// Локальный запуск: `node index.mjs '{"name":"Тест","phone":"+7...","consent":"yes"}'`
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const arg = process.argv[2] || '{}';
-  handler({ httpMethod: 'POST', body: arg }).then((r) => {
-    console.log(r.statusCode, r.body);
-  });
+// Локальный запуск: node index.js '{"name":"Тест","phone":"+7","consent":"yes"}'
+if (require.main === module) {
+  module.exports.handler({ httpMethod: 'POST', body: process.argv[2] || '{}' })
+    .then((r) => console.log(r.statusCode, r.body));
 }

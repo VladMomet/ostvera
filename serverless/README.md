@@ -6,7 +6,7 @@
 
 ```
 serverless/lead/
-  index.mjs      обработчик (export const handler)
+  index.js      обработчик (export const handler)
   package.json   зависимость nodemailer (для e-mail)
 ```
 
@@ -41,7 +41,7 @@ serverless/lead/
 cd serverless/lead
 npm install
 TELEGRAM_BOT_TOKEN=xxx TELEGRAM_CHAT_ID=123456 \
-  node index.mjs '{"name":"Иван","phone":"+79990000000","need":"3 УЗИ","consent":"yes"}'
+  node index.js '{"name":"Иван","phone":"+79990000000","need":"3 УЗИ","consent":"yes"}'
 # → 200 {"ok":true}
 ```
 

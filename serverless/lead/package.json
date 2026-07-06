@@ -2,9 +2,8 @@
   "name": "ostvera-lead",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
   "description": "Serverless handler for POST /api/lead — Telegram + e-mail notification",
-  "main": "index.mjs",
+  "main": "index.js",
   "engines": { "node": ">=18" },
   "dependencies": {
     "nodemailer": "^6.9.14"
