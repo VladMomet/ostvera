@@ -1,50 +1,164 @@
-# Yandex Cloud API Gateway — единый вход для сайта на одном домене.
-#
-#   POST /api/lead        → Cloud Function (serverless/lead)
-#   всё остальное (GET)    → Object Storage со ВКЛЮЧЁННЫМ static website hosting
-#                            (website-endpoint сам резолвит index.html для /ru/,
-#                            / и отдаёт 404.html — object_storage-интеграция так
-#                            не умеет, поэтому проксируем через http).
-#
-# Плейсхолдеры <...> заменить. Создать/обновить шлюз:
-#   yc serverless api-gateway create --name ostvera --spec=deploy/yandex/apigateway.yaml
-#   yc serverless api-gateway update ostvera --spec=deploy/yandex/apigateway.yaml
+# API Gateway: /api/lead → Cloud Function, статика → Object Storage (object_storage).
+# Плейсхолдеры <...> подставляются provision.sh (sed) или вручную.
 openapi: 3.0.0
-info:
-  title: ostvera
-  version: "1.0"
-
+info: { title: ostvera, version: "1.0" }
 paths:
-  # --- обработчик заявки: same-origin, поэтому фронт шлёт на /api/lead ---
   /api/lead:
     post:
-      x-yc-apigateway-integration:
-        type: cloud_functions
-        function_id: <FUNCTION_ID>            # id функции из serverless/lead
-        tag: "$latest"
-        service_account_id: <SERVICE_ACCOUNT_ID>
-    options:                                   # CORS preflight — тоже в функцию
       x-yc-apigateway-integration:
         type: cloud_functions
         function_id: <FUNCTION_ID>
         tag: "$latest"
         service_account_id: <SERVICE_ACCOUNT_ID>
-
-  # --- корень сайта ---
+    options:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <FUNCTION_ID>
+        tag: "$latest"
+        service_account_id: <SERVICE_ACCOUNT_ID>
   /:
     get:
       x-yc-apigateway-integration:
-        type: http
-        url: https://<BUCKET_NAME>.website.yandexcloud.net/
-
-  # --- вся статика: проксируем на website-endpoint бакета ---
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/about/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/about/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/consent/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/consent/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/contacts/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/contacts/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/cookie/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/cookie/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/offer/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/offer/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/privacy/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/privacy/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /en/services/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: en/services/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/about/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/about/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/consent/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/consent/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/contacts/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/contacts/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/cookie/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/cookie/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/offer/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/offer/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/privacy/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/privacy/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
+  /ru/services/:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: ru/services/index.html
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
   /{path+}:
     get:
       parameters:
-        - name: path
-          in: path
-          required: true
-          schema: { type: string }
+        - { name: path, in: path, required: true, schema: { type: string } }
       x-yc-apigateway-integration:
-        type: http
-        url: https://<BUCKET_NAME>.website.yandexcloud.net/{path}
+        type: object_storage
+        bucket: <BUCKET_NAME>
+        object: "{path}"
+        error_object: 404.html
+        service_account_id: <SERVICE_ACCOUNT_ID>
