@@ -1,5 +1,6 @@
-# API Gateway: /api/lead → Cloud Function, статика → Object Storage (object_storage).
-# Плейсхолдеры <...> подставляются provision.sh (sed) или вручную.
+# API Gateway: /api/lead → Cloud Function; статика → Object Storage (object_storage).
+# Важно: ключи маршрутов каталогов БЕЗ завершающего слэша — YC срезает его из запроса
+# (/ru/ → /ru), иначе запрос уходит в greedy /{path+}. Плейсхолдеры подставляет provision.sh.
 openapi: 3.0.0
 info: { title: ostvera, version: "1.0" }
 paths:
@@ -24,7 +25,7 @@ paths:
         object: index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/:
+  /en:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -32,7 +33,7 @@ paths:
         object: en/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/about/:
+  /en/about:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -40,7 +41,7 @@ paths:
         object: en/about/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/consent/:
+  /en/consent:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -48,7 +49,7 @@ paths:
         object: en/consent/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/contacts/:
+  /en/contacts:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -56,7 +57,7 @@ paths:
         object: en/contacts/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/cookie/:
+  /en/cookie:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -64,7 +65,7 @@ paths:
         object: en/cookie/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/offer/:
+  /en/offer:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -72,7 +73,7 @@ paths:
         object: en/offer/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/privacy/:
+  /en/privacy:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -80,7 +81,7 @@ paths:
         object: en/privacy/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /en/services/:
+  /en/services:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -88,7 +89,7 @@ paths:
         object: en/services/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/:
+  /ru:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -96,7 +97,7 @@ paths:
         object: ru/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/about/:
+  /ru/about:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -104,7 +105,7 @@ paths:
         object: ru/about/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/consent/:
+  /ru/consent:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -112,7 +113,7 @@ paths:
         object: ru/consent/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/contacts/:
+  /ru/contacts:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -120,7 +121,7 @@ paths:
         object: ru/contacts/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/cookie/:
+  /ru/cookie:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -128,7 +129,7 @@ paths:
         object: ru/cookie/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/offer/:
+  /ru/offer:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -136,7 +137,7 @@ paths:
         object: ru/offer/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/privacy/:
+  /ru/privacy:
     get:
       x-yc-apigateway-integration:
         type: object_storage
@@ -144,7 +145,7 @@ paths:
         object: ru/privacy/index.html
         error_object: 404.html
         service_account_id: <SERVICE_ACCOUNT_ID>
-  /ru/services/:
+  /ru/services:
     get:
       x-yc-apigateway-integration:
         type: object_storage
