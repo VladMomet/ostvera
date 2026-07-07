@@ -47,7 +47,18 @@ const jsonld = {
     <meta property="og:url" content={canonical} />
     <meta name="robots" content="index,follow" />
     <script type="application/ld+json" set:html={JSON.stringify(jsonld)} />
-    <!-- TODO: Яндекс.Метрика — вставить код счётчика и цель на форму / insert Metrica counter here -->
+    <!-- Yandex.Metrika counter -->
+    <script is:inline type="text/javascript">
+      (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110474682', 'ym');
+      ym(110474682, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/110474682" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
   </head>
   <body>
     <Header lang={lang} path={path} />
@@ -95,6 +106,7 @@ const jsonld = {
               body: JSON.stringify(Object.fromEntries(new FormData(f))),
             });
           } catch (e) {}
+          if (window.ym) window.ym(110474682, 'reachGoal', 'lead'); // цель Метрики
           if (ok) ok.style.display = 'block';
           f.reset();
         });
