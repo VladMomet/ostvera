@@ -135,7 +135,7 @@ p{margin:0}
 .sec--alt{background:var(--paper-2)}
 .sec__hd{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:start;margin-bottom:var(--sp-7)}
 .sec__no{font-family:var(--font-mono);font-size:14px;color:var(--muted);padding-top:8px;letter-spacing:.05em}
-.sec__h{max-width:40ch}
+.sec__h{max-width:46rem}
 .sec__h h2{font-size:clamp(28px,3.4vw,44px)}
 .sec__h p{margin-top:16px;color:#33383300;color:#333833;max-width:46ch}
 
